@@ -1,10 +1,10 @@
 """
-Roche Coding Session - Pure Python Solution
--------------------------------------------
+Roche Coding Session - Pure Python Solution (Final)
+--------------------------------------------------
 This script demonstrates a simple ETL pipeline that:
 1. Reads user and order data from CSV files
 2. Performs an inner join on 'user_id'
-3. Enriches the dataset with a derived 'order_category'
+3. Adds a derived column 'order_category' based on the order amount
 4. Loads the final result into a SQLite database
 
 Author: Arun Kumar Sathiya Moorthy
@@ -43,11 +43,11 @@ def transform(users: pd.DataFrame, orders: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame: Joined and enriched dataset
     """
-    # Perform inner join on user_id
+    # Inner join on user_id
     merged = pd.merge(users, orders, on="user_id", how="inner")
 
-    # Add a new derived column 'order_category'
-    merged["order_category"] = merged["order_value"].apply(
+    # Add a new column 'order_category' using 'amount'
+    merged["order_category"] = merged["amount"].apply(
         lambda x: "High" if x >= 100 else "Low"
     )
 
@@ -62,7 +62,7 @@ def load_to_sqlite(df: pd.DataFrame, db_path: str):
         df (DataFrame): Final dataset to store
         db_path (str): Path to the output SQLite database file
     """
-    # Ensure output directory exists
+    # Ensure the output directory exists
     Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
     # Write the DataFrame to SQLite
@@ -89,6 +89,6 @@ def main():
     print(f"Merged {len(merged)} rows and wrote to {output_db}")
 
 
-# Execute only if this file is run directly (not imported)
+# Execute only if this file is run directly
 if __name__ == "__main__":
     main()
